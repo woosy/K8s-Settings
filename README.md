@@ -14,7 +14,7 @@
     net.bridge.bridge-nf-call-ip6tables = 1 
     net.ipv4.ip_forward = 1 
     EOF
-    0
+    
     sudo sysctl --system
 
 
@@ -29,17 +29,6 @@
 
     systemctl disable firewalld
 
-### CRI 설치
-
-    sudo apt-get install -y containerd
-    sudo mkdir -p /etc/containerd/
-
-    containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
-    sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
-
-    sudo systemctl daemon-reload
-    sudo systemctl start containerd
-    sudo systemctl enable containerd
 
 ### Installing kubeadm
 
@@ -60,6 +49,16 @@
       echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee    /etc/apt/sources.list.d/kubernetes.list
 
 ### CNI 설치(Master node)
+
+    sudo apt-get install -y containerd
+    sudo mkdir -p /etc/containerd/
+
+    containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
+    sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+
+    sudo systemctl daemon-reload
+    sudo systemctl start containerd
+    sudo systemctl enable containerd
 
 
 ###  kubelet kubeadm kubectl 설치 (Master, worker node)
