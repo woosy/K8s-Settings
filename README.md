@@ -31,6 +31,16 @@
 
 ### CRI 설치
 
+    sudo apt-get install -y containerd
+    sudo mkdir -p /etc/containerd/
+
+    containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
+    sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+
+    sudo systemctl daemon-reload
+    sudo systemctl start containerd
+    sudo systemctl enable containerd
+
 #### 참고 : [kubernetes v1.29](https://v1-29.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
 
 - Update the apt package index and install packages
