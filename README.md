@@ -87,5 +87,10 @@ cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 to the file /boot/firm
 
 - 이후 Join (worker node)
     
+### token 재생성
 
+    # 현재 토큰 확인
+    sudo kubeadm token list
 
+    # 토큰 재생성 및 join 명령어 생성
+    sudo kubeadm token  create --print-join-command
