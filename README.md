@@ -41,6 +41,8 @@
     sudo systemctl start containerd
     sudo systemctl enable containerd
 
+### Installing kubeadm
+
 #### 참고 : [kubernetes v1.29](https://v1-29.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
 
 - Update the apt package index and install packages
