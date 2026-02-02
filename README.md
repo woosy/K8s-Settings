@@ -7,7 +7,7 @@
     br_netfilter
     EOF
 
-### 파라미터 설정
+### Kernel parameter settings 
 
     cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf 
     net.bridge.bridge-nf-call-iptables = 1 
@@ -18,21 +18,17 @@
     sudo sysctl --system
 
 
-### swap off 및 방화벽
+### Swap off 
 
 
     sudo sed -i '/swap/d' /etc/fstab
 
     sudo swapoff -a
 
-    systemctl stop firewalld
-
-    systemctl disable firewalld
-
 
 ### Installing kubeadm
 
-#### 참고 : [kubernetes v1.29](https://v1-29.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
+#### ref : [kubernetes v1.29](https://v1-29.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
 
 - Update the apt package index and install packages
 -     sudo apt-get update
@@ -48,7 +44,7 @@
 -     # This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
       echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee    /etc/apt/sources.list.d/kubernetes.list
 
-### CNI 설치(Master node)
+### Install containerd runtime (Master, Worker node)
 
     sudo apt-get install -y containerd
     sudo mkdir -p /etc/containerd/
@@ -61,13 +57,13 @@
     sudo systemctl enable containerd
 
 
-###  kubelet kubeadm kubectl 설치 (Master, worker node)
+###  Install kubelet kubeadm kubectl (Master, Worker node)
 
     sudo apt-get update
     sudo apt-get install -y kubelet kubeadm kubectl
     sudo apt-mark hold kubelet kubeadm kubectl
 
-### kubernetes cluster 초기화(Master node)
+### Initialize kubernetes cluster (Master node)
 
 cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 to the file /boot/firmware/cmdline.txt. 
 
@@ -75,7 +71,7 @@ cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 to the file /boot/firm
 -     sudo kubeadm token create --print-join-command
       sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=<master_IP> --cri-socket unix:///var/run/containerd/containerd.sock
 
-- kubeconfig 설정
+- kubeconfig 
 -     mkdir -p $HOME/.kube
       sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
       sudo chown $(id -u):$(id -g) $HOME/.kube/config
@@ -85,12 +81,9 @@ cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 to the file /boot/firm
       sudo systemctl restart kubelet
       kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
-- 이후 Join (worker node)
+- Join (worker node)
     
-### token 재생성
+### Create a new Join token
 
-    # 현재 토큰 확인
     sudo kubeadm token list
-
-    # 토큰 재생성 및 join 명령어 생성
-    sudo kubeadm token  create --print-join-command
+    sudo kubeadm token  create --print-join-command # To Get the Full Join Command
